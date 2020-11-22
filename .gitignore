@@ -1,0 +1,13 @@
+/node_modules
+/vendor
+/app
+/app.*
+/.idea
+/.idea/*
+.idea
+.editorconfig
+.env
+.rnd
+Homestead.json
+core.yaml
+web.yaml

@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+  webapp:
+    image: nginx:alpine
+    container_name: web-${PROJECT}
+    volumes:
+      #      - ./etc/ssl:/etc/ssl
+      - ./app:/var/www
+      - ./data/nginx/logs/web:/var/log/nginx/
+      - ./etc/nginx/web:/etc/nginx/templates/
+    environment:
+      - VIRTUAL_HOST=${NGINX_V_HOST}
+      - PROJECT=${PROJECT}
+    restart: always
+    depends_on:
+      - web-php
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webapp.entrypoints=http"
+      - "traefik.http.routers.webapp.rule=Host(`$WEB`) || Host(`admin.$WEB`)"
+  #      - "traefik.http.routers.web.tls=true"
+  #      - "traefik.http.routers.web.tls.certresolver=letsEncrypt"
+
+  web-php:
+    image: nanoninja/php-fpm:${PHP_VERSION}
+    container_name: php-${PROJECT}
+    restart: always
+    volumes:
+      - ./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./etc/php/www.conf:/usr/local/etc/php-fpm.d/wwww.conf
+      - ./data/php:/var/log/httpd/
+      - ./app:/var/www
+#    extra_hosts:
+#      - "${API_COACH}:172.18.0.2"
+#      - "${API_NEWS}:172.18.0.12"
+#      - "${API_ACCOUNT}:172.18.0.10"
+
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+
+

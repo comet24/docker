@@ -1,0 +1,8 @@
+/db/mysql/
+/db/mysql/*
+/db/redis/
+/db/redis/*
+/nginx/logs
+/nginx/logs/*
+/php/*
+/php

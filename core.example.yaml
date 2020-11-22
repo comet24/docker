@@ -1,0 +1,48 @@
+version: '3.1'
+
+services:
+
+  # traefik config
+  traefik:
+    image: traefik:${TRAEFIK_VERSION}
+    container_name: traefik_${PROJECT}
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./etc/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+
+  # mysql config
+  db:
+    image: mysql:${MYSQL_VERSION}
+    container_name: mysql_db_${PROJECT}
+    restart: always
+    tty: true
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+    volumes:
+      - ./data/db/mysql:/var/lib/mysql
+
+  # phpmyadmin config
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_${PROJECT}
+    restart: always
+    ports:
+      - '8585:80'
+    environment:
+      PMA_HOST: mysql_db_${PROJECT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
